@@ -1,0 +1,13 @@
+﻿Activemq支持一下三種模式： 
+	Session.AUTO_ACKNOWLEDGE  消息自动签收 ，默认为自动签收
+	Session.CLIENT_ACKNOWLEDGE  客戶端调用acknowledge方法手动签收，注意：需要注意的是，在这种模式中，确认是在会话层上进行，确认一个被消费的消息将自动确认所有已被会话消费的消息。例如，如果一个消费消费者消费了10个消息，然后确认第5个消息，那么所有10个消息都被确认。
+		代码示例如下： 
+		session = connection.createSession(true, Session.CLIENT_ACKNOWLEDGE); 
+		textMsg.acknowledge(); 
+	Session.DUPS_OK_ACKNOWLEDGE 不是必须签收，消息可能会重复发送。在第二次重新传送消息的时候，消息头的JmsDelivered会被置为true标示当前消息已经传送过一次，客户端需要进行消息的重复处理控制。 
+
+
+持久订阅者和非持久订阅者针对的是Topic，而不是Queue
+当Broker发送消息给订阅者时，如果订阅者处于 inactive 状态：持久订阅者可以收到消息，而非持久订阅者则收不到消息。
+类似于QQ消息，别人给你发了离线消息，如果是非持久订阅者 就收到不离线消息。
+造成的影响是：当持久订阅者处于 inactive 状态时，Broker需要为持久订阅者保存消息，如果持久订阅者订阅的消息太多则会溢出。(当消息投递成功之后，Broker就可以把消息删除了)
